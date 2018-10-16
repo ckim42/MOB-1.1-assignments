@@ -7,15 +7,16 @@
 
 import SpriteKit
 import GameplayKit
-import Darwin
 
 class GameScene: SKScene {
-    var score = 0
-    let scoreLabel = SKLabelNode(fontNamed: "Helvetica")
+    var score: Int = 0
+    var scoreLabel: SKLabelNode!
     var lastUpdateTime: TimeInterval?
     
     // This function is called when the scene is displayed
     override func didMove(to view: SKView) {
+        scoreLabel = SKLabelNode(fontNamed: "Helvetica")
+        scoreLabel.name = "ScoreLabelNode"
         //positioning the score counter
         scoreLabel.horizontalAlignmentMode = .left
         scoreLabel.position = CGPoint(x: 25, y: 615)
@@ -36,7 +37,12 @@ class GameScene: SKScene {
             let node = atPoint(touchLocation)
             if node.name == "singlesquare" {
                 node.removeFromParent()
-                score += 1
+                if self.score < 0 {
+                    self.scoreLabel.text = "Game Over!"
+                } else {
+                    self.score += 1
+                    self.scoreLabel.text = "Score: \(self.score)"
+                }
             }
         }
     }
@@ -63,7 +69,12 @@ class GameScene: SKScene {
         let moveUP = SKAction.moveTo(y: view.bounds.height, duration: randomSpeed)
         let remove = SKAction.removeFromParent()
         let hitsTOP = SKAction.run {
-            self.score -= 1
+            if self.score < 0 {
+                self.scoreLabel.text = "Game Over!"
+            } else {
+                self.score -= 1
+                self.scoreLabel.text = "Score: \(self.score)"
+            }
         }
         // shove those two into the same variable
         let seq = SKAction.sequence([moveUP, remove, hitsTOP])
@@ -74,20 +85,6 @@ class GameScene: SKScene {
         // make the square run the sequence
         apple.run(seq)
     }
-    
-//    func gameOver(n: Int) {
-//        var start = 0
-//        var end = n
-//        for i in 0 ... n {
-//            if i % 2 == 0 {
-//                print(start)
-//                start += 1
-//            } else {
-//                print(end)
-//                end -= 1
-//            }
-//        }
-//    }
     
     override func update(_ currentTime: TimeInterval) {
 //         Called before each frame is rendered
@@ -101,7 +98,7 @@ class GameScene: SKScene {
             //some time has passed. time to update lastUpdateTime
             lastUpdateTime = currentTime
             //code to show the NEW COUNTER - unless maybe this code belongs 100% in other funcs?
-            scoreLabel.text = "Score: \(score)"
+//            scoreLabel.text = "Score: \(score)"
         }
     }
 }
